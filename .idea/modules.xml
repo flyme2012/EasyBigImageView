@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/EasyBigImageViewDemo.iml" filepath="$PROJECT_DIR$/EasyBigImageViewDemo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/easyBigImageViewDemo/easyBigImageViewDemo.iml" filepath="$PROJECT_DIR$/easyBigImageViewDemo/easyBigImageViewDemo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/easyBigImageViewLibrary/easyBigImageViewLibrary.iml" filepath="$PROJECT_DIR$/easyBigImageViewLibrary/easyBigImageViewLibrary.iml" />
+    </modules>
+  </component>
+</project>
