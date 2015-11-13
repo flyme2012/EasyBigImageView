@@ -20,6 +20,9 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.ImageView;
 
+/**
+ * auto:陌上尖
+ */
 public class EasyBigImageView extends View{
 
 	public EasyBigImageView(Context context, AttributeSet attrs, int defStyle) {
@@ -57,6 +60,10 @@ public class EasyBigImageView extends View{
 	}
 	
 	private void checkSize(){
+		if (mBitmapRegionDecoder == null){
+			canMove = false ;
+			return;
+		}
 		showWidth = Math.min(screanWidth, bitmapWidth);
 		showHeight = Math.min(screnHeight, bitmapHeight);
 		
@@ -71,6 +78,8 @@ public class EasyBigImageView extends View{
 	@Override
 	protected void onDraw(Canvas canvas) {
 		canvas.save();
+		if (!canMove)
+			return;
 		Bitmap decodeRegion = mBitmapRegionDecoder.decodeRegion(mRect, options);
 		canvas.drawBitmap(decodeRegion, 0, 0, null);
 		canvas.restore();
@@ -153,10 +162,11 @@ public class EasyBigImageView extends View{
 			BitmapFactory.decodeStream(mInputStream, null, options);
 			bitmapWidth = options.outWidth ;
 			bitmapHeight = options.outHeight ;
+
+			requestLayout();
 			
 		} catch (IOException e) {
 		}
-		
 	}
 	
 	public void setBitmapByFile(File file){
