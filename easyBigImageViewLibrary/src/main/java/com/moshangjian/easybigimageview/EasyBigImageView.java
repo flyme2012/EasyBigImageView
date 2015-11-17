@@ -15,6 +15,7 @@ import android.graphics.BitmapRegionDecoder;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -23,7 +24,7 @@ import android.widget.ImageView;
 /**
  * auto:陌上尖
  */
-public class EasyBigImageView extends View{
+public class EasyBigImageView extends View implements Cache.CacheListener {
 
 	public EasyBigImageView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
@@ -57,31 +58,42 @@ public class EasyBigImageView extends View{
 		screanWidth = getWidth() ;
 		screnHeight = getHeight() ;
 		checkSize();
+		mCache.setImageSize(screanWidth, screnHeight);
 	}
 	
 	private void checkSize(){
-		if (mBitmapRegionDecoder == null){
-			canMove = false ;
-			return;
-		}
+//		if (mBitmapRegionDecoder == null){
+//			canMove = false ;
+//			return;
+//		}
 		showWidth = Math.min(screanWidth, bitmapWidth);
 		showHeight = Math.min(screnHeight, bitmapHeight);
-		
-		mRect.left = (bitmapWidth - showWidth ) / 2 ; 
-		mRect.right = mRect.left + showWidth ; 
-		mRect.top = (bitmapHeight - showHeight ) / 2 ;
+
+		//居中
+//		mRect.left = (bitmapWidth - showWidth ) / 2 ;
+//		mRect.right = mRect.left + showWidth ;
+//		mRect.top = (bitmapHeight - showHeight ) / 2 ;
+//		mRect.bottom = mRect.top + showHeight ;
+
+		mRect.left = 0 ;
+		mRect.right = mRect.left + showWidth ;
+		mRect.top = 0 ;
 		mRect.bottom = mRect.top + showHeight ;
-		
+
 		canMove = screanWidth < bitmapWidth || screnHeight < bitmapHeight ? true : false ;
+
 	}
-	
+
+	private Cache mCache ;
+
 	@Override
 	protected void onDraw(Canvas canvas) {
 		canvas.save();
 		if (!canMove)
 			return;
-		Bitmap decodeRegion = mBitmapRegionDecoder.decodeRegion(mRect, options);
-		canvas.drawBitmap(decodeRegion, 0, 0, null);
+		if (mCache != null){
+			mCache.draw(canvas,mRect);
+		}
 		canvas.restore();
 	}
 	
@@ -89,6 +101,7 @@ public class EasyBigImageView extends View{
 	private int startY ; 
 	
 	private boolean canMove ;
+	private boolean isTouch = false ;
 	
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
@@ -98,18 +111,13 @@ public class EasyBigImageView extends View{
 		int action = event.getAction() & MotionEvent.ACTION_MASK ;
 		switch (action) {
 		case MotionEvent.ACTION_DOWN:
+			isTouch = true ;
 			startX = (int) event.getX();
 			startY = (int) event.getY();
 			break;
 		case MotionEvent.ACTION_MOVE:
 			int delayX = (int) (event.getX() - startX) ;
 			int delayY = (int) (event.getY() - startY) ;
-			if (Math.abs(delayX) < slop) {
-				delayX = 0  ;
-			}
-			if (Math.abs(delayY) < slop) {
-				delayY = 0;
-			}
 			if (delayX !=0 || delayY != 0) {
 				move(-delayX, -delayY);
 				startX = (int) event.getX() ;
@@ -118,6 +126,8 @@ public class EasyBigImageView extends View{
 			break;
 		case MotionEvent.ACTION_UP:
 		case MotionEvent.ACTION_CANCEL:
+			isTouch = false ;
+			mCache.loadClearBitmap(mRect);
 			break;
 		}
 		return true;
@@ -128,32 +138,29 @@ public class EasyBigImageView extends View{
 			mRect.left = 0 ;
 			mRect.right = showWidth ;
 		}else if((mRect.right + offsetX) >= bitmapWidth ) {
-			mRect.right = bitmapWidth ; 
+			mRect.right = bitmapWidth ;
 			mRect.left = mRect.right - showWidth ;
 		}else {
-			mRect.offset(offsetX, 0);
+			mRect.offset(offsetX,0);
 		}
+
 		if ((mRect.top + offsetY) <= 0 ){
 			mRect.top = 0 ;
 			mRect.bottom = showHeight ;
 		}else if((mRect.bottom + offsetY) >= bitmapHeight ) {
-			mRect.bottom = bitmapHeight ; 
+			mRect.bottom = bitmapHeight ;
 			mRect.top = mRect.bottom - showHeight ;
 		}else {
-			mRect.offset(0, offsetY);
+			mRect.offset(0,offsetY);
 		}
 		invalidate();
 	}
-	
-	private BitmapRegionDecoder mBitmapRegionDecoder ;
+
 	private Options options;
 	private int showWidth;
 	private int showHeight; 
 	public void setBitmapByInputStream(InputStream mInputStream){
 		try {
-			if (mBitmapRegionDecoder == null) {
-				mBitmapRegionDecoder = BitmapRegionDecoder.newInstance(mInputStream, false);
-			}
 			
 			options = new BitmapFactory.Options();
 			options.inPreferredConfig = Bitmap.Config.RGB_565 ;
@@ -163,9 +170,12 @@ public class EasyBigImageView extends View{
 			bitmapWidth = options.outWidth ;
 			bitmapHeight = options.outHeight ;
 
+			mCache = new Cache(mInputStream);
+			mCache.setCacheListener(this);
+
 			requestLayout();
 			
-		} catch (IOException e) {
+		} catch (Exception e) {
 		}
 	}
 	
@@ -177,7 +187,10 @@ public class EasyBigImageView extends View{
 		File file = new File(path);
 		setBitmapByFile(file);
 	}
-	
-	
-	
+
+	@Override
+	public void cacheOver() {
+		if (!isTouch)
+			invalidate();
+	}
 }

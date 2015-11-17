@@ -2,17 +2,10 @@
 <items version="2" >
 
     <item
-        jar="/Users/ledu/Downloads/adt-bundle-mac-x86_64-20140702/sdk/extras/android/m2repository/com/android/support/support-v4/19.1.0/support-v4-19.1.0.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="85f201b380937e61a9dce6ca90ccf6872abbfb67">
-        <dex dex="/Users/ledu/androidwork/androidstu/EasyBigImageViewDemo/easyBigImageViewDemo/build/intermediates/pre-dexed/debug/support-v4-19.1.0-f1160654f79753c1b8258f5effbafc703475f8cc.jar" />
-    </item>
-    <item
         jar="/Users/ledu/androidwork/androidstu/EasyBigImageViewDemo/easyBigImageViewDemo/build/intermediates/exploded-aar/EasyBigImageViewDemo/easyBigImageViewLibrary/unspecified/jars/classes.jar"
         jumboMode="false"
         revision="23.0.1"
-        sha1="fa8e71297cdb40dc2dfc090f9fd4e36799d5d8b9">
+        sha1="9440ef380465a6713b0570266cf84f70a5c16593">
         <dex dex="/Users/ledu/androidwork/androidstu/EasyBigImageViewDemo/easyBigImageViewDemo/build/intermediates/pre-dexed/debug/classes-78e221347259d1125ff111f9cff68891528e8c9c.jar" />
     </item>
 
